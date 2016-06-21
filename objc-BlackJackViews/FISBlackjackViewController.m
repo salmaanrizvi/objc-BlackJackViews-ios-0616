@@ -70,6 +70,8 @@
 -(void) initializeNewGameLabels {
     
     // Hide House and Player labels that don't have immediate values to start
+    self.houseScoreLabel.text = @"";
+    
     self.houseScoreLabel.hidden = self.houseCardLabel1.hidden =
     self.houseCardLabel2.hidden = self.houseCardLabel3.hidden =
     self.houseCardLabel4.hidden = self.houseCardLabel5.hidden =
@@ -88,13 +90,14 @@
 - (IBAction)dealButtonTapped:(id)sender {
     
     [self initializeNewGameLabels];
+    NSLog(@"Score Label Hidden? %d", self.houseScoreLabel.hidden);
     [self.game deal];
     NSLog(@"%@", self.game.player);
     NSLog(@"%@", self.game.house);
     
     // House set up
-    self.houseScoreLabel.text = [NSString stringWithFormat:@"Score: %lu", self.game.house.handscore];
-    self.houseCardLabel1.text = ((FISCard *)self.game.house.cardsInHand[0]).cardLabel;
+    //self.houseScoreLabel.text = [NSString stringWithFormat:@"Score: %lu", self.game.house.handscore];
+    self.houseCardLabel1.text = @"❂";
     self.houseCardLabel2.text = ((FISCard *)self.game.house.cardsInHand[1]).cardLabel;
 
     
@@ -149,7 +152,7 @@
     if([player.name isEqualToString:@"House"]) {
         ((UILabel *)self.houseCardLabelArray[cardCount - 1]).text = ((FISCard *)player.cardsInHand[cardCount - 1]).cardLabel;
         ((UILabel *)self.houseCardLabelArray[cardCount - 1]).hidden = NO;
-        self.houseScoreLabel.text = [NSString stringWithFormat:@"Score: %lu", player.handscore];
+        //self.houseScoreLabel.text = [NSString stringWithFormat:@"Score: %lu", player.handscore];
         
         if(player.shouldHit) {
             self.houseActionLabel.text = @"Hit";
@@ -180,19 +183,26 @@
             [self.game incrementWinsAndLossesForHouseWins:NO];
         }
         
+        // Show who won
         self.winnerLabel.hidden = NO;
         
+        // Display all the house cards and score
+        self.houseScoreLabel.text = [NSString stringWithFormat:@"Score: %lu", self.game.house.handscore];
+        self.houseScoreLabel.hidden = NO;
+        self.houseCardLabel1.text = ((FISCard *)self.game.house.cardsInHand[0]).cardLabel;
+        
+        // Updat and display player and house wins and losses
         self.playerWinsLabel.text = [NSString stringWithFormat:@"Wins: %lu", self.game.player.wins];
         self.playerLossesLabel.text = [NSString stringWithFormat:@"Losses: %lu", self.game.player.losses];
-        
         self.houseWinsLabel.text = [NSString stringWithFormat:@"Wins: %lu", self.game.house.wins];
         self.houseLossesLabel.text = [NSString stringWithFormat:@"Losses: %lu", self.game.house.losses];
-        
         self.playerWinsLabel.hidden = self.playerLossesLabel.hidden =
         self.houseWinsLabel.hidden = self.houseLossesLabel.hidden = NO;
         
+        // Disble the hit and stay buttons after game has ended
         self.playerHitButton.enabled = self.playerStayButton.enabled = NO;
         
+        // Display correct busted or blackjack label if neccessary
         if (self.game.house.busted) {
             self.houseBustedLabel.hidden = NO;
         }
